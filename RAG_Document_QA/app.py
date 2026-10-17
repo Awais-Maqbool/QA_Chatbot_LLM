@@ -39,12 +39,10 @@ prompt = ChatPromptTemplate.from_template(
 
 def create_vector_embedding():
     if "vectors" not in st.session_state:
-        from langchain_huggingface import HuggingFaceEndpointEmbeddings
+        from langchain_huggingface import HuggingFaceEmbeddings
 
-        embeddings = HuggingFaceEndpointEmbeddings(
-        model="sentence-transformers/all-MiniLM-L6-v2",
-        task="feature-extraction",
-        huggingfacehub_api_token=st.secrets["HUGGINGFACE_TOKEN"]
+        embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
         st.session_state.embeddings = embeddings
         st.session_state.loader=PyPDFDirectoryLoader("research_papers") ## Data Ingestion step
