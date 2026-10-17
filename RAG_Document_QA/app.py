@@ -92,14 +92,22 @@ st.title("RAG Document Q&A With Groq And Lama3")
 
 user_prompt=st.text_input("Enter your query from the research paper")
 
+
 if st.button("Document Embedding"):
+    st.write("Step 1: Button clicked")
+
     try:
         create_vector_embedding()
+        st.write("Step 2: Embedding function finished")
 
         if "vectors" in st.session_state:
             st.success("Vector Database is ready!")
+        else:
+            st.error("Embedding function finished, but vectors were not created.")
+
     except Exception as e:
         st.error(f"Embedding failed: {e}")
+
 
 import time
 if user_prompt:
