@@ -44,16 +44,10 @@ def create_vector_embedding():
         st.session_state.docs=st.session_state.loader.load() ## Document Loading
         st.session_state.text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=200)
         st.session_state.final_documents=st.session_state.text_splitter.split_documents(st.session_state.docs[:10])
+        test_embedding = st.session_state.embeddings.embed_query("Test embedding")
+        st.write("Embedding dimensions:", len(test_embedding))
         st.session_state.vectors=FAISS.from_documents(st.session_state.final_documents,st.session_state.embeddings)
 
-    st.write("Loaded PDFs:", len(st.session_state.docs))
-    st.write("Document chunks:", len(st.session_state.final_documents))
-
-    test_embedding = st.session_state.embeddings.embed_query(
-        "Test embedding"
-    )
-
-st.write("Embedding dimensions:", len(test_embedding))
 st.title("RAG Document Q&A With Groq And Lama3")
 
 user_prompt=st.text_input("Enter your query from the research paper")
