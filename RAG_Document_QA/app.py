@@ -19,7 +19,7 @@ key = os.getenv("GROQ_API_KEY")
 from langchain_groq import ChatGroq
 model = ChatGroq(
     model='openai/gpt-oss-120b',
-    groq_api_key=key
+    api_key=st.secrets["GROQ_API_KEY"]
 )
 
 prompt = ChatPromptTemplate.from_template(
