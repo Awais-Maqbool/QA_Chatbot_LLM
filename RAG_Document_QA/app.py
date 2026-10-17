@@ -37,56 +37,58 @@ prompt = ChatPromptTemplate.from_template(
     '''
 )
 
+
 def create_vector_embedding():
-    if "vectors" not in st.session_state:
-        from langchain_huggingface import HuggingFaceEmbeddings
+    from pathlib import Path
+    from langchain_huggingface import HuggingFaceEmbeddings
 
-        embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
-        st.session_state.embeddings = embeddings
-
-        from pathlib import Path
-
-        PDF_FOLDER = Path(__file__).parent / "research_papers"
-
-        st.write("Looking for PDFs in:", str(PDF_FOLDER))
-        st.write("Folder exists:", PDF_FOLDER.exists())
-
-        if PDF_FOLDER.exists():
-            st.write("PDF files:", [p.name for p in PDF_FOLDER.glob("*.pdf")])
-
-        st.session_state.loader = PyPDFDirectoryLoader(str(PDF_FOLDER))
-        st.session_state.docs = st.session_state.loader.load()
-
-        st.write("Documents loaded:", len(st.session_state.docs))
-        
-        st.session_state.docs=st.session_state.loader.load() ## Document Loading
-
-        st.write("Documents loaded:", len(st.session_state.docs))
-
-        if not st.session_state.docs:
-            st.error("No PDFs found or no documents could be loaded.")
+    if "vectors" in st.session_state:
+        st.write("Vector database already exists.")
         return
 
-        st.write(
-            "First document text:",
-            st.session_state.docs[0].page_content[:500]
-        )
-        
-        st.session_state.text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=200)
-        st.session_state.final_documents=st.session_state.text_splitter.split_documents(st.session_state.docs[:10])
-        test_embedding = st.session_state.embeddings.embed_query("Test embedding")
-        st.write("Embedding dimensions:", len(test_embedding))
-        if not st.session_state.final_documents:
-            st.error("No document chunks found. Check your PDFs.")
-            return
+    st.write("Step 3: Initializing embedding model")
 
-        st.session_state.vectors = FAISS.from_documents(
-            st.session_state.final_documents,
-            st.session_state.embeddings
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    st.session_state.embeddings = embeddings
+
+    pdf_folder = Path(__file__).parent / "research_papers"
+    st.write("PDF folder:", pdf_folder)
+
+    loader = PyPDFDirectoryLoader(str(pdf_folder))
+    docs = loader.load()
+
+    st.write("Documents loaded:", len(docs))
+
+    if not docs:
+        raise ValueError("No PDF documents were loaded.")
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200
+    )
+
+    final_documents = splitter.split_documents(docs)
+
+    st.write("Chunks created:", len(final_documents))
+
+    if not final_documents:
+        raise ValueError(
+            "No text chunks were extracted from the PDFs."
         )
-        st.session_state.vectors=FAISS.from_documents(st.session_state.final_documents,st.session_state.embeddings)
+
+    st.write("Step 4: Creating FAISS vector database")
+
+    vectors = FAISS.from_documents(
+        final_documents,
+        embeddings
+    )
+
+    st.session_state.vectors = vectors
+
+    st.write("Step 5: Vector database saved in session.")
+
 
 st.title("RAG Document Q&A With Groq And Lama3")
 
