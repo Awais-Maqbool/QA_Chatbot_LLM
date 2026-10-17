@@ -47,6 +47,18 @@ def create_vector_embedding():
         st.session_state.embeddings = embeddings
         st.session_state.loader=PyPDFDirectoryLoader("research_papers") ## Data Ingestion step
         st.session_state.docs=st.session_state.loader.load() ## Document Loading
+
+        st.write("Documents loaded:", len(st.session_state.docs))
+
+        if not st.session_state.docs:
+            st.error("No PDFs found or no documents could be loaded.")
+        return
+
+        st.write(
+            "First document text:",
+            st.session_state.docs[0].page_content[:500]
+        )
+        
         st.session_state.text_splitter=RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=200)
         st.session_state.final_documents=st.session_state.text_splitter.split_documents(st.session_state.docs[:10])
         test_embedding = st.session_state.embeddings.embed_query("Test embedding")
