@@ -13,12 +13,6 @@ langchain-mcp-adapters
 mcp
 langchain-mcp-adapters
 streamlit
-<<<<<<< HEAD
 pypdf
 faiss-cpu
 langchain-huggingface
-=======
-pypdf   
-faiss-cpu
-langchain-huggingface
->>>>>>> fdef950 (Update project files and requirements)
