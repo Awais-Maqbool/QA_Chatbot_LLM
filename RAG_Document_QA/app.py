@@ -51,6 +51,14 @@ def create_vector_embedding():
         st.session_state.final_documents=st.session_state.text_splitter.split_documents(st.session_state.docs[:10])
         test_embedding = st.session_state.embeddings.embed_query("Test embedding")
         st.write("Embedding dimensions:", len(test_embedding))
+        if not st.session_state.final_documents:
+            st.error("No document chunks found. Check your PDFs.")
+            return
+
+        st.session_state.vectors = FAISS.from_documents(
+            st.session_state.final_documents,
+            st.session_state.embeddings
+        )
         st.session_state.vectors=FAISS.from_documents(st.session_state.final_documents,st.session_state.embeddings)
 
 st.title("RAG Document Q&A With Groq And Lama3")
