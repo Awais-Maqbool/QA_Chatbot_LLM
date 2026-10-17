@@ -10,6 +10,11 @@ from langchain_classic.chains.combine_documents import create_stuff_documents_ch
 from langchain_classic.chains import create_retrieval_chain
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 
+
+import streamlit as st
+
+st.write("Groq key exists:", "GROQ_API_KEY" in st.secrets)
+
 import os
 from dotenv import  load_dotenv 
 load_dotenv()
