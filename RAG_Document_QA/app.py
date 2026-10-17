@@ -60,22 +60,36 @@ st.title("RAG Document Q&A With Groq And Lama3")
 user_prompt=st.text_input("Enter your query from the research paper")
 
 if st.button("Document Embedding"):
-    create_vector_embedding()
-    st.write("Vector Database is ready")
+    try:
+        create_vector_embedding()
+
+        if "vectors" in st.session_state:
+            st.success("Vector Database is ready!")
+    except Exception as e:
+        st.error(f"Embedding failed: {e}")
 
 import time
 if user_prompt:
-    document_chain = create_stuff_documents_chain(model,prompt)
-    retriever = st.session_state.vectors.as_retriever()
-    retrievr_chain = create_retrieval_chain(retriever,document_chain)
+    if "vectors" not in st.session_state:
+        st.warning("Please click 'Document Embedding' first.")
+    else:
+            document_chain = create_stuff_documents_chain(
+                model, prompt
+            )
 
-    start = time.process_time()
-    response = retrievr_chain.invoke({'input':user_prompt})
-    print(f'time taken : {time.process_time()-start}')
+            retriever = st.session_state.vectors.as_retriever()
 
-    st.write(response['answer'])
+            retrieval_chain = create_retrieval_chain(
+                retriever, document_chain
+            )
 
-    with st.expander("Document similarity Search"):
-        for i,doc in enumerate(response['context']):
-            st.write(doc.page_content)
-            st.write('------------------------')
+            response = retrieval_chain.invoke({
+                "input": user_prompt
+            })
+
+            st.write(response["answer"])
+
+            with st.expander("Document Similarity Search"):
+                for doc in response["context"]:
+                    st.write(doc.page_content)
+                    st.write("------------------------")
