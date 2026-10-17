@@ -45,7 +45,22 @@ def create_vector_embedding():
         model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
         st.session_state.embeddings = embeddings
-        st.session_state.loader=PyPDFDirectoryLoader("research_papers") ## Data Ingestion step
+
+        from pathlib import Path
+
+        PDF_FOLDER = Path(__file__).parent / "research_papers"
+
+        st.write("Looking for PDFs in:", str(PDF_FOLDER))
+        st.write("Folder exists:", PDF_FOLDER.exists())
+
+        if PDF_FOLDER.exists():
+            st.write("PDF files:", [p.name for p in PDF_FOLDER.glob("*.pdf")])
+
+        st.session_state.loader = PyPDFDirectoryLoader(str(PDF_FOLDER))
+        st.session_state.docs = st.session_state.loader.load()
+
+        st.write("Documents loaded:", len(st.session_state.docs))
+        
         st.session_state.docs=st.session_state.loader.load() ## Document Loading
 
         st.write("Documents loaded:", len(st.session_state.docs))
